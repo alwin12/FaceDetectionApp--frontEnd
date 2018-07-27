@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import {Redirect,Link} from 'react-router-dom'
+
 
 class SignIn  extends Component{
 
@@ -7,7 +9,8 @@ class SignIn  extends Component{
     super(props);
     this.state ={
       signInEmail: '',
-      signInPassword: ''
+      signInPassword: '',
+      signedIn: false
     }
   }
 
@@ -37,8 +40,16 @@ class SignIn  extends Component{
     .then(response => response.json()).then(user=>{
       console.log(user)
       if (user.id){
-        this.props.loadUser(user)
-     this.props.onRouteChange('home');
+
+         this.props.loadUser(user)
+        this.props.logIn();
+     this.setState({signedIn:true})
+
+
+       
+
+     //this.props.onRouteChange('home');
+
 
       }
     }).catch(err => console.log('error'))
@@ -48,10 +59,20 @@ class SignIn  extends Component{
 
  }
 render() {
+  const {AuthButton,login,authentication} = this.props;
+  
+
+   
+
+if (this.state.signedIn){
+
+return <Redirect to = {{pathname: "/home"}}/>
+}
+
 
 return (
     
-<main className="pa4 black-80">
+<main className="pa4 black-80 mt4">
 <article class="center mw5 mw6-ns br3 hidden ba b--black-10 mv4">
   <form className="measure ">
     <fieldset id="sign_up" className="ba b--transparent ph0 mh0">
@@ -68,9 +89,10 @@ return (
     </fieldset>
     <div className="">
       <input onClick={this.onSubmitSignIn} className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib" type="button" value="Sign in"/>
+     
     </div>
     <div className="lh-copy mt3">
-      <p onClick= {()=>this.props.onRouteChange('register') } href="#0" className="f6 link dim black db">Register</p>
+     <Link to = "/register"><p onClick= {()=>this.props.onRouteChange('register') } href="#0" className="f6 link dim black db">Register</p></Link>
       
     </div>
   </form>
@@ -80,8 +102,9 @@ return (
 
     );
 
-
+  
 }
+
 
 	
 }
