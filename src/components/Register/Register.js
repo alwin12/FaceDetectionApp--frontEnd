@@ -1,7 +1,9 @@
 import React from 'react'
+import {Link,Redirect} from 'react-router-dom'
 
 
-class  Register extends React.Component{
+
+class Register extends React.Component{
 
   constructor(props){
     super(props);
@@ -9,7 +11,8 @@ class  Register extends React.Component{
 
        name:"",
        email:"",
-       password:""
+       password:"",
+       isRegistered:false 
 
       }
   }
@@ -29,7 +32,7 @@ class  Register extends React.Component{
 
  onSubmitRegister=()=> {
 
-      fetch('http://localhost:3000/register',{
+      fetch('https://secret-journey-86720.herokuapp.com/register',{
 
     method: 'post',
     headers: {'Content-type': 'application/json'},
@@ -44,7 +47,9 @@ class  Register extends React.Component{
      console.log(user);
      if(user.id){
       this.props.loadUser(user);
-      this.props.onRouteChange('home');
+      this.props.logIn();
+       this.setState({isRegistered:true})
+    
      }
 
 
@@ -52,10 +57,14 @@ class  Register extends React.Component{
 
       
     }
-
+  
   render() {
 
-   
+   if(this.state.isRegistered){
+    return <Redirect to= {{pathname:'/home'}}/>
+
+     
+   }
 
 	return (
 		
@@ -82,7 +91,7 @@ class  Register extends React.Component{
       <input onClick = {this.onSubmitRegister} className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib" type="button" value="Register"/>
     </div>
     <div className="lh-copy mt3">
-      <p onClick = {() =>this.props.onRouteChange('signIn')}href="#0" className="f6 link dim black db">Sign in</p>
+     <Link to = "/signin"> <p href="#0" className="f6 link dim black db">Sign in</p></Link>
       
     </div>
   </form>

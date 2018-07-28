@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+
 import Navigation from './components/Navigation/Navigation'
 import Logo from './components/Logo/Logo'
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm'
@@ -9,20 +10,10 @@ import Register from './components/Register/Register'
 import SignIn from './components/SignIn/SignIn'
 import './App.css';
 import Clarifai from 'clarifai'
+import {BrowserRouter as Router, Route, Redirect,withRouter,Link,Switch} from 'react-router-dom'
+import ParticleConfig from "./ParticleConfig"
 
 
-const particleOptions = 
-{
-                particles: {
-                  line_linked: {
-                    shadow: {
-                      enable: true,
-                      color: "#3CA9D1",
-                      blur: 5
-                    }
-                  }
-                }
-              }
               
 
     let initialState = {
@@ -42,6 +33,38 @@ joined: ''
     }
 
      }
+const authentication = {
+  isAuthenticated: false,
+  authenticate() {
+    this.isAuthenticated = true
+  },
+  signOut(cb) {
+    this.isAuthenticated = false;
+    setTimeout(cb,100)
+
+  }
+}
+
+
+const AuthButton = withRouter(({history})=> 
+
+ authentication.isAuthenticated? (
+
+    <div style= {{display:"flex",justifyContent: "flex-end"}}>
+    <p className = 'f3 link dim black underline pa3 pointer' onClick = {()=>{authentication.signOut(()=>history.push("/signin"))}}>
+ 
+ Sign Out
+
+    </p>
+    </div>
+
+ ):(
+  <div>please log in </div>   
+ 
+ )
+
+)
+
 
 
 class App extends Component {
@@ -88,7 +111,7 @@ joined: data.joined
     onButtonSubmit=(event) => {
            this.setState({imageUrl:this.state.input});
       
-     fetch('http://localhost:3000/imageUrl',{
+     fetch('https://secret-journey-86720.herokuapp.com/imageUrl',{
 
    method: 'post',
    headers: {'Content-type': 'application/json'},
@@ -104,7 +127,7 @@ joined: data.joined
 {
      if(response.outputs){
 
-  fetch('http://localhost:3000/image',{
+  fetch('https://secret-journey-86720.herokuapp.com/image',{
 
    method:'put',
    headers:{'Content-type':'application/json'},
@@ -167,42 +190,83 @@ joined: data.joined
 
 
     }
+
+     logIn = () => {
+
+
+      authentication.authenticate();
+    }
   render() {
-
-
-   
-
-   
     return (
 
-      <div className="App">
-       
-       <Particles className='particles' params = {particleOptions}/>
-        
-       <Navigation onRouteChange={this.onRouteChange} isSignedIn={this.state.isSignedIn}/>
-       {this.state.route === 'home'?
 
-       <div>
-       <Logo/>
+<Router>
+<div className = "App">
+       <Particles className='particles' params = {ParticleConfig}/>
+    
+    <Switch>
+      
+      
+       <Route path = "/signin" render ={(props)=>{
+
+
+        return (
+       
+        <SignIn onRouteChange ={this.onRouteChange} loadUser = {this.loadUser} AuthButton = {AuthButton} logIn = {this.logIn} authentication = {authentication}/>
+        
+        )
+       }} />
+       <Route exact path = "/" render = {()=> (<Redirect to = "/signin"/>)}/>
+        <Route exact path ="/register" render = {(props)=>{
+
+
+          return (
+
+        <Register onRouteChange ={this.onRouteChange} loadUser = {this.loadUser} logIn = {this.logIn}/>
+
+          )
+        }}/>
+       <Route path = "/home" render= { props => authentication.isAuthenticated
+     
+       ? (
+
+      <div >
+      <AuthButton/>
+         <Logo/>
+         
        <Rank name={this.state.user.name} entries={this.state.user.entries}/>
        <ImageLinkForm onInputChange = {this.onInputChange} onButtonSubmit = {this.onButtonSubmit}/>
       
      <FaceRecognition box ={this.state.box} imageUrl ={this.state.imageUrl}/>
-   </div>
-
-   :(
-    this.state.route === 'signIn' ? 
-    <SignIn onRouteChange ={this.onRouteChange} loadUser = {this.loadUser}/>
-  : <Register onRouteChange ={this.onRouteChange} loadUser = {this.loadUser}/>
-
-   )
-       
-       
-       
- }
+     
       </div>
+
+
+       ): (
+      <Redirect  to = {{pathname: "/signin", state: {from: props.location}}}/>
+
+       )
+
+
+       } /> 
+
+      </Switch>
+    </div>
+      </Router>
     );
+
   }
 }
+ 
+ 
+
+
 
 export default App;
+
+
+
+
+
+
+
