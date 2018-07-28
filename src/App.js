@@ -111,7 +111,7 @@ joined: data.joined
     onButtonSubmit=(event) => {
            this.setState({imageUrl:this.state.input});
       
-     fetch('http://localhost:3000/imageUrl',{
+     fetch('https://secret-journey-86720.herokuapp.com/imageUrl',{
 
    method: 'post',
    headers: {'Content-type': 'application/json'},
@@ -127,7 +127,7 @@ joined: data.joined
 {
      if(response.outputs){
 
-  fetch('http://localhost:3000/image',{
+  fetch('https://secret-journey-86720.herokuapp.com/image',{
 
    method:'put',
    headers:{'Content-type':'application/json'},
